@@ -1,3 +1,5 @@
+import { MermaidConfig } from "mermaid";
+
 export type B64String = string; // TODO tag it
 
 /*
@@ -17,3 +19,11 @@ var b64encoded = btoa(Uint8ToString(u8));
 export const uint8ToB64 = (a: Uint8Array): B64String => btoa(String.fromCharCode.apply(null, [...a]));
 export const b64ToUint8 = (b: B64String): Uint8Array => new Uint8Array(atob(b).split("").map(function(c) {
   return c.charCodeAt(0); }));
+
+export const allowedMermaidThemes: MermaidConfig['theme'][] = [
+  'default', 'base', 'dark', 'forest', 'neutral', 'null', undefined
+] as const;
+export type AllowedMermaidTheme = typeof allowedMermaidThemes[number];
+export const allowedMermaidThemesS = new Set(allowedMermaidThemes);
+export const isAllowedMermaidTheme = (s: string | undefined): s is AllowedMermaidTheme =>
+  allowedMermaidThemesS.has(s as AllowedMermaidTheme);

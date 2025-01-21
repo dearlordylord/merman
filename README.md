@@ -18,6 +18,10 @@ Encoder is a helper app that lets you encode mermaid diagrams into gzipped url p
 
 Don't care about size, so, react an all.
 
+### Envs
+
+VITE_BASE_URL to set your Renderer's base url that the Encoder will generate links to
+
 # Dev
 
 `npx nx serve renderer`

@@ -1,15 +1,8 @@
-import React, { MouseEventHandler, useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Check, Copy } from 'lucide-react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
-const sample = `
-graph TD
-  A[Start] --> B[Process]
-  B --> C[End]
-  B --> D[Alternative]
-  `;
-
-const CopyableInput = ({ value = '' }) => {
+const CopyableInput = ({ value = '', placeholder = '' }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback((e: Pick<MouseEvent, 'preventDefault'>) => {
@@ -37,7 +30,7 @@ const CopyableInput = ({ value = '' }) => {
       }}
     >
       <input
-        placeholder={sample}
+        placeholder={placeholder}
         type="text"
         readOnly
         value={value}
