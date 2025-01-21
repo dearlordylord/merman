@@ -1,6 +1,12 @@
 # Intro
 
-Two static sites
+Self-hosted Mermaid renderer (frontend-side).
+
+A tiny app that renders mermaid diagram from url query param (the current technique used on mermaid.live) for e.g. use in iframes.
+
+Use if you'd like to self-host / customize, otherwise use https://mermaid.live/
+
+Repo contains of two static sites and some shared code.
 
 ## Renderer
 
