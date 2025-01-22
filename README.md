@@ -19,8 +19,6 @@ Renderer takes gzipped mermaid diagram from url and unpacks/renders it. Minimum 
 
 Encoder is a helper app that lets you encode mermaid diagrams into gzipped url part.
 
-Don't care about size, so, react an all.
-
 ### Envs
 
 VITE_BASE_URL to set your Renderer's base url that the Encoder will generate links to
