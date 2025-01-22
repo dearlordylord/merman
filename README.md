@@ -25,13 +25,14 @@ VITE_BASE_URL to set your Renderer's base url that the Encoder will generate lin
 # Dev
 
 `npx nx serve renderer`
+
 `npx nx serve encoder`
 
 # Build
 
-`npx nx build renderer`
-`npx nx build encoder`
+`VITE_BASE_URL="https://merman.dearlordylord.com" npx nx build encoder --prod --skip-nx-cache`
 
+`npx nx build renderer --prod`
 
 # Tests
 
