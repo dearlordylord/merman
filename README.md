@@ -32,7 +32,7 @@ VITE_BASE_URL to set your Renderer's base url that the Encoder will generate lin
 
 `VITE_BASE_URL="https://merman.dearlordylord.com" npx nx build encoder --prod --skip-nx-cache`
 
-`npx nx build renderer --prod`
+`VITE_ENCODER_URL="https://merman.encoder.dearlordylord.com" npx nx build renderer --prod`
 
 # Tests
 
