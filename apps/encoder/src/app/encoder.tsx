@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { deflate, deflateToQueryParam } from '@merman/pako';
+import { deflate, deflateToQueryParam, inflate } from '@merman/pako';
 import CopyableInput from './cinput';
 import { AllowedMermaidTheme, allowedMermaidThemes, B64String, QUERY_PARAM, THEME_QUERY_PARAM } from '@merman/utils';
 import { BASE_URL } from './env';
@@ -26,13 +26,13 @@ const useLink = (mermaid: string, theme: AllowedMermaidTheme) => useMemo<Url>(()
 }, [mermaid, theme]);
 
 const iframeCode = (link: Url, width: UInt, height: UInt): HtmlString => `
-  <iframe
-    src="${link}" width="${width/*0s*/ ? `${width}px` : width}" height="${height ? `${height}px` : height}"
-    sandbox="allow-scripts allow-forms"
-    referrerpolicy="no-referrer"
-    loading="lazy"
-  />
-`;
+<iframe
+  src="${link}" width="${width/*0s*/ ? `${width}px` : width}" height="${height ? `${height}px` : height}"
+  sandbox="allow-scripts allow-forms"
+  referrerpolicy="no-referrer"
+  loading="lazy"
+/>
+`.replace(/\n\s+/g, ' ');
 
 const NONE_THEME_STRING = 'None';
 
@@ -83,8 +83,24 @@ const IframePart = ({link}: {link: string}) => {
   );
 };
 
+// yanks mermaid diagram from url for decoding; QoL
+const yankUrl = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const yanked = urlParams.get(QUERY_PARAM) || '';
+  urlParams.delete(QUERY_PARAM);
+  const newUrl = `${window.location.pathname}${urlParams.toString() ? `?${urlParams.toString()}` : ''}${window.location.hash}`;
+  window.history.replaceState({}, '', newUrl);
+
+  // it's still b64 so:
+  const mermaid = yanked ? inflate(yanked) : ''
+
+  return () => mermaid;
+};
+
+const mermaidFromUrl = yankUrl();
+
 const Encoder = () => {
-  const [v, setV] = useState('');
+  const [v, setV] = useState(mermaidFromUrl);
   const [theme, setTheme] = useState<AllowedMermaidTheme>('default');
   const link = useLink(v, theme);
 
