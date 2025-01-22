@@ -28,7 +28,8 @@ export class AppElement extends HTMLElement {
   }
 
   connectedCallback() {
-    this.innerHTML = this.mermaid ? `<pre class="mermaid">${this.mermaid}</pre>` :
+    this.innerHTML = this.mermaid ? `<div><pre class="mermaid">${this.mermaid}</pre>${ENCODER_URL ? `
+    <div style="display: none"><a href="${ENCODER_URL}">want to generate another iframe? use the encoder website</a></div>` : ''}</div>` :
       `<p>no "${QUERY_PARAM}" query param found; you can generate an url on ${ENCODER_URL ? `<a href="${ENCODER_URL}">the encoder website</a>` : `the encoder website (no url provided in env)` }</p>`;
   }
 }
