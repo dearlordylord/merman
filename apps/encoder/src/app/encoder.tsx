@@ -1,7 +1,14 @@
 import { useCallback, useMemo, useState } from "react";
 import { deflate, deflateToQueryParam, inflate } from '@merman/pako';
 import CopyableInput from './cinput';
-import { AllowedMermaidTheme, allowedMermaidThemes, B64String, QUERY_PARAM, THEME_QUERY_PARAM } from '@merman/utils';
+import {
+  AllowedMermaidTheme,
+  allowedMermaidThemes,
+  B64String, PAN_ZOOM_VARIANTS,
+  PANZOOM_QUERY_PARAM,
+  QUERY_PARAM,
+  THEME_QUERY_PARAM
+} from '@merman/utils';
 import { BASE_URL } from './env';
 
 const sample = `
@@ -15,15 +22,16 @@ type Url = string; // TODO brand
 type HtmlString = string; // TODO brand
 type UInt = number; // TODO brand
 
-const useLink = (mermaid: string, theme: AllowedMermaidTheme) => useMemo<Url>(() => {
+const useLink = (mermaid: string, theme: AllowedMermaidTheme, panzoom: boolean) => useMemo<Url>(() => {
   {
     const b64 = deflate(mermaid);
     const url = new URL(BASE_URL);
     url.searchParams.append(QUERY_PARAM, b64);
     if (theme) url.searchParams.append(THEME_QUERY_PARAM, theme);
+    if (panzoom) url.searchParams.append(PANZOOM_QUERY_PARAM, PAN_ZOOM_VARIANTS[0]);
     return url.href;
   }
-}, [mermaid, theme]);
+}, [mermaid, theme, panzoom]);
 
 const iframeCode = (link: Url, width: UInt, height: UInt): HtmlString => `
 <iframe
@@ -102,16 +110,18 @@ const mermaidFromUrl = yankUrl();
 const Encoder = () => {
   const [v, setV] = useState(mermaidFromUrl);
   const [theme, setTheme] = useState<AllowedMermaidTheme>('default');
-  const link = useLink(v, theme);
+  const [panzoom, setPanZoom] = useState<boolean>(false);
+  const link = useLink(v, theme, panzoom);
 
   return (
     <div className="max-w-4xl mx-auto p-6">
       <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
         <div>
           <p className="text-sm font-medium text-gray-700 mb-2">
-            Paste Mermaid diagram code into the textarea
+            <label htmlFor="code">Paste Mermaid diagram code into the textarea</label>
           </p>
           <textarea
+            id="code"
             value={v}
             onChange={(e) => setV(e.target.value)}
             className="w-full h-40 p-3 border rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -119,8 +129,9 @@ const Encoder = () => {
         </div>
 
         <div>
-          <p className="text-sm font-medium text-gray-700 mb-2">Select a theme</p>
+          <p className="text-sm font-medium text-gray-700 mb-2"><label htmlFor="theme">Select a theme</label></p>
           <select
+            id="theme"
             value={theme}
             onChange={(e) => setTheme(e.target.value === NONE_THEME_STRING ? undefined : e.target.value as AllowedMermaidTheme)}
             className="w-full sm:w-auto px-3 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -131,6 +142,11 @@ const Encoder = () => {
               </option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <p className="text-sm font-medium text-gray-700 mb-2"><label htmlFor="panzoom">Enable pan/zoom? (zoomable vs. static Mermaid)</label></p>
+          <input id="panzoom" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" type="checkbox" checked={panzoom} onChange={(e) => setPanZoom(e.target.checked)}/>
         </div>
 
         <div>
