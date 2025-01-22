@@ -26,7 +26,12 @@ const useLink = (mermaid: string, theme: AllowedMermaidTheme) => useMemo<Url>(()
 }, [mermaid, theme]);
 
 const iframeCode = (link: Url, width: UInt, height: UInt): HtmlString => `
-  <iframe src="${link}" width="${width/*0s*/ ? `${width}px` : width}" height="${height ? `${height}px` : height}" />
+  <iframe
+    src="${link}" width="${width/*0s*/ ? `${width}px` : width}" height="${height ? `${height}px` : height}"
+    sandbox="allow-scripts allow-forms"
+    referrerpolicy="no-referrer"
+    loading="lazy"
+  />
 `;
 
 const NONE_THEME_STRING = 'None';
