@@ -44,8 +44,10 @@ const CopyableInput = ({ value = '', placeholder = '' }) => {
           <Copy className="h-5 w-5 text-gray-400 group-hover:text-gray-600" />
         )}
       </div>
-      <span className="sr-only">Click to copy: {value}</span>
+
     </div>
+
+
   );
 };
 
