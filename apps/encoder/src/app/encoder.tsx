@@ -33,51 +33,97 @@ const NONE_THEME_STRING = 'None';
 
 const useSetUInt = (cb: (v: UInt) => void) => useCallback((v: number) => cb(v < 0 ? 0 : Math.floor(v)), [cb]);
 
-const IframePart = ({link}: {link: Url}) => {
-  const [width, setWidth_] = useState<UInt>(600);
-  const [height, setHeight_] = useState<UInt>(600);
+const IframePart = ({link}: {link: string}) => {
+  const [width, setWidth_] = useState<number>(600);
+  const [height, setHeight_] = useState<number>(600);
   const setWidth = useSetUInt(setWidth_);
   const setHeight = useSetUInt(setHeight_);
   const code = iframeCode(link, width, height);
+
   return (
-    <div>
-      <h3>Iframe code:</h3>
-      <label htmlFor="width">Width</label>
-      <input id="width" type="number" step="1" min="0" value={width}
-             onChange={e => setWidth(e.target.valueAsNumber)}/>
-      <label htmlFor="height">Height</label>
-      <input id="height" type="number" step="1" min="0" value={height}
-             onChange={e => setHeight(e.target.valueAsNumber)}/>
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-gray-800">Iframe code:</h3>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex items-center gap-2">
+          <label htmlFor="width" className="text-sm font-medium text-gray-700">Width</label>
+          <input
+            id="width"
+            type="number"
+            step="1"
+            min="0"
+            value={width}
+            onChange={e => setWidth(e.target.valueAsNumber)}
+            className="w-24 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <label htmlFor="height" className="text-sm font-medium text-gray-700">Height</label>
+          <input
+            id="height"
+            type="number"
+            step="1"
+            min="0"
+            value={height}
+            onChange={e => setHeight(e.target.valueAsNumber)}
+            className="w-24 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
       <CopyableInput value={code} />
-      <h3>Preview</h3>
-      <div dangerouslySetInnerHTML={{
-        __html: code
-      }}/>
+      <div>
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Preview</h3>
+        <div dangerouslySetInnerHTML={{ __html: code }}/>
+      </div>
     </div>
-  )
-}
+  );
+};
 
 const Encoder = () => {
   const [v, setV] = useState('');
   const [theme, setTheme] = useState<AllowedMermaidTheme>('default');
-
   const link = useLink(v, theme);
-  return <div>
-    <form onSubmit={(e) => e.preventDefault()}>
-      <p>Paste Mermaid diagram code into the textarea</p>
-      <textarea value={v} onChange={(e) => setV(e.target.value)}/>
-      <p>Select a theme</p>
-      <select value={theme} onChange={(e) =>
-        setTheme(e.target.value === NONE_THEME_STRING ? undefined : e.target.value as AllowedMermaidTheme)
-      }>
-        {allowedMermaidThemes.map(t => <option key={t || NONE_THEME_STRING} value={t}>{t || NONE_THEME_STRING}</option>)}
-      </select>
-      <p>Copy the resulting link:</p>
-      <CopyableInput value={link} placeholder={sample}/>
-      <div>Click to copy or use <a href={link}>the link</a></div>
-      {v ? <IframePart link={link} /> : null}
-    </form>
-  </div>;
-}
+
+  return (
+    <div className="max-w-4xl mx-auto p-6">
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+        <div>
+          <p className="text-sm font-medium text-gray-700 mb-2">
+            Paste Mermaid diagram code into the textarea
+          </p>
+          <textarea
+            value={v}
+            onChange={(e) => setV(e.target.value)}
+            className="w-full h-40 p-3 border rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <p className="text-sm font-medium text-gray-700 mb-2">Select a theme</p>
+          <select
+            value={theme}
+            onChange={(e) => setTheme(e.target.value === NONE_THEME_STRING ? undefined : e.target.value as AllowedMermaidTheme)}
+            className="w-full sm:w-auto px-3 py-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {allowedMermaidThemes.map(t => (
+              <option key={t || NONE_THEME_STRING} value={t}>
+                {t || NONE_THEME_STRING}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <p className="text-sm font-medium text-gray-700 mb-2">Copy the resulting link:</p>
+          <CopyableInput value={link} placeholder={sample} />
+          <div className="mt-2 text-sm text-gray-600">
+            Click to copy or use <a href={link} className="text-blue-500 hover:text-blue-600">the link</a>
+          </div>
+        </div>
+
+        {v && <IframePart link={link} />}
+      </form>
+    </div>
+  );
+};
 
 export default Encoder;
