@@ -10,6 +10,7 @@ import {
   THEME_QUERY_PARAM
 } from '@merman/utils';
 import { BASE_URL } from './env';
+import { toast } from 'react-toastify';
 
 const sample = `
 graph TD
@@ -107,12 +108,35 @@ const yankUrl = () => {
 
 const mermaidFromUrl = yankUrl();
 
+// people will try to paste url
+const sanitizeDeflated = (s: string) => {
+  try {
+    const url = new URL(s);
+    const deflated = url.searchParams.get(QUERY_PARAM);
+    if (deflated) return deflated;
+  } catch (e) {}
+  // in case somebody copy-pastes from url
+  return decodeURIComponent(s)
+}
+
 const Encoder = () => {
   const [v, setV] = useState(mermaidFromUrl);
   const [theme, setTheme] = useState<AllowedMermaidTheme>('default');
   const [panzoom, setPanZoom] = useState<boolean>(false);
   const link = useLink(v, theme, panzoom);
-
+  const deflated = useMemo(() => deflate(v), [v]);
+  const setDeflated = useCallback((deflated: B64String) => {
+    // corner case
+    if (deflated === '') return;
+    try {
+      // garbage is possible, the function is sensitive to invalid b64
+      const inflated = inflate(deflated);
+      setV(inflated);
+    } catch (e) {
+      toast.error('invalid b64 string: ' + deflated);
+      console.error(e);
+    }
+  }, []);
   return (
     <div className="max-w-4xl mx-auto p-6">
       <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
@@ -125,6 +149,17 @@ const Encoder = () => {
             value={v}
             onChange={(e) => setV(e.target.value)}
             className="w-full h-40 p-3 border rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="zip">or convert back from the encoded version</label>
+          </p>
+          <input
+            id="zip"
+            value={deflated}
+            onChange={(e) => setDeflated(sanitizeDeflated(e.target.value))}
+            className="w-full h-5 p-3 border rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -145,19 +180,22 @@ const Encoder = () => {
         </div>
 
         <div>
-          <p className="text-sm font-medium text-gray-700 mb-2"><label htmlFor="panzoom">Enable pan/zoom? (zoomable vs. static Mermaid)</label></p>
-          <input id="panzoom" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" type="checkbox" checked={panzoom} onChange={(e) => setPanZoom(e.target.checked)}/>
+          <p className="text-sm font-medium text-gray-700 mb-2"><label htmlFor="panzoom">Enable pan/zoom? (zoomable vs.
+            static Mermaid)</label></p>
+          <input id="panzoom"
+                 className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                 type="checkbox" checked={panzoom} onChange={(e) => setPanZoom(e.target.checked)}/>
         </div>
 
         <div>
           <p className="text-sm font-medium text-gray-700 mb-2">Copy the resulting link:</p>
-          <CopyableInput value={link} placeholder={sample} />
+          <CopyableInput value={link} placeholder={sample}/>
           <div className="mt-2 text-sm text-gray-600">
-            Click to copy or use <a href={link} className="text-blue-500 hover:text-blue-600">the link</a>
+            Click to copy or use <a target="_blank" href={link} className="text-blue-500 hover:text-blue-600">the link</a>
           </div>
         </div>
 
-        {v && <IframePart link={link} />}
+        {v && <IframePart link={link}/>}
       </form>
     </div>
   );
