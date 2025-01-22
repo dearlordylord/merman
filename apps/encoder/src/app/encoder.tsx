@@ -66,7 +66,7 @@ const Encoder = () => {
     <form onSubmit={(e) => e.preventDefault()}>
       <p>Paste Mermaid diagram code into the textarea</p>
       <textarea value={v} onChange={(e) => setV(e.target.value)}/>
-      <p>[Select a theme]</p>
+      <p>Select a theme</p>
       <select value={theme} onChange={(e) =>
         setTheme(e.target.value === NONE_THEME_STRING ? undefined : e.target.value as AllowedMermaidTheme)
       }>
